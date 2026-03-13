@@ -1,21 +1,32 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-int compare(const void *a, const void *b)
-{
-    return (*(int*)a - *(int*)b);
-}
+#define HASH_SIZE 200003
 
-bool containsDuplicate(int* nums, int numsSize)
-{
-    qsort(nums, numsSize, sizeof(int), compare);
+typedef struct Node {
+    int val;
+    struct Node* next;
+} Node;
 
-    for(int i = 1; i < numsSize; i++)
-    {
-        if(nums[i] == nums[i-1])
-        {
-            return true;
+bool containsDuplicate(int* nums, int numsSize) {
+    
+    Node* hash[HASH_SIZE] = {0};
+
+    for(int i = 0; i < numsSize; i++) {
+        int key = abs(nums[i]) % HASH_SIZE;
+
+        Node* curr = hash[key];
+
+        while(curr) {
+            if(curr->val == nums[i])
+                return true;
+            curr = curr->next;
         }
+
+        Node* newNode = (Node*)malloc(sizeof(Node));
+        newNode->val = nums[i];
+        newNode->next = hash[key];
+        hash[key] = newNode;
     }
 
     return false;
